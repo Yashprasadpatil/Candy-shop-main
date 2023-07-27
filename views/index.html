@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/index.css" />
+    <title>CANDY SHOP APP</title>
+  </head>
+  <body>
+    <form onsubmit="userDetails(event)">
+      <label>Item Name-</label><br />
+      <input type="text" name="name" id="name" /><br />
+      <label>Description</label><br />
+      <input type="text" id="description" name="description" /><br />
+      <label>Price</label><br />
+      <input type="number" id="amount" /><br />
+      <label>Quantity</label><br />
+      <input type="number" id="quantity" /><br />
+      <br />
+      <button>Submit</button>
+    </form>
+    <ul id="listofusers"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.2.0/axios.min.js"></script>
+    <script>
+      const nameEl = document.querySelector("#name");
+      const descriptionEl = document.querySelector("#description");
+      const amountEl = document.querySelector("#amount");
+      const quantityEl = document.querySelector("#quantity");
+      function userDetails(event) {
+        event.preventDefault();
+
+        const obj = {
+          name: nameEl.value,
+          description: descriptionEl.value,
+          amount: amountEl.value,
+          quantity: quantityEl.value,
+        };
+
+        axios
+          .post("http://localhost:4000/expense/add-user", obj)
+          .then((response) => {
+            shownewuseronscreen(response);
+          })
+          .catch((err) => {
+            document.body.innerHTML =
+              document.body.innerHTML + "<h4>something went wrong </h4>";
+            console.log(err);
+          });
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        axios
+          .get("http://localhost:4000/expense/get-users")
+          .then((response) => {
+            console.log(response);
+            for (var i = 0; i < response.length; i++) {
+              shownewuseronscreen(response[i]);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+
+      function shownewuseronscreen(user) {
+        document.querySelector("#name").value = "";
+        document.querySelector("#description").value = "";
+        document.querySelector("#amount").value = "";
+        document.querySelector("#quantity").value = "";
+
+        const parentnode = document.getElementById("listofusers");
+        const childnode = `<li id=${user.id}>${user.name} ${user.description} ${user.amount} ${user.quantity}
+                                 <button onclick=deleteUser('${user.id}')> Buy 1</button>
+                               `;
+        parentnode.innerHTML = parentnode.innerHTML + childnode;
+      }
+
+      // function edituser(name, description, amount, quantity, userid) {
+      //   document.getElementById("name").value = name;
+      //   document.getElementById("description").value = description;
+      //   document.getElementById("amount").value = amount;
+      //   document.getElementById("quantity").value = quantity;
+      //   deleteUser(userid);
+      // }
+
+      function deleteUser(userid) {
+        axios
+          .delete(`http://localhost:4000/expense/delete-user/${userid}`)
+          .then((response) => {
+            removeuserfromscreen(userid);
+            console.log("deleted");
+          })
+          .catch((err) => {
+            console.log(err);
+            res.sendStatus(500).json(err);
+          });
+        const parentnode = document.getElementById("listofusers");
+        parentnode.innerHTML = "";
+        axios
+          .get("http://localhost:4000/expense/get-users")
+          .then((response) => {
+            //console.log(response);
+            for (var i = 0; i < response.length; i++) {
+              shownewuseronscreen(response[i]);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      function removeuserfromscreen(userid) {
+        const parentnode = document.getElementById("listofusers");
+        const childnodeisdeleted = document.getElementById(userid);
+        parentnode.removeChild(childnodeisdeleted);
+      }
+    </script>
+  </body>
+</html>

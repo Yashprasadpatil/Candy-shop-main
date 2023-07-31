@@ -1,12 +1,13 @@
 const User = require("../models/User");
 exports.adduser = async (req, res, next) => {
+
   console.log("req.body", req.body);
   try {
     const name = req.body.name;
     const description = req.body.description;
     const amount = req.body.amount;
     const quantity = req.body.quantity;
-    // console.log(req.body)
+    //console.log(req.body)
 
     const data = await User.create({
       name: name,

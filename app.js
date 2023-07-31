@@ -1,6 +1,10 @@
 const express = require("express");
 const path = require("path");
 
+const dotenv = require("dotenv");
+dotenv.config();
+
+
 const bodyParser = require("body-parser");
 const rootDir = require("./util/path");
 const sequelize = require("./util/database");
@@ -14,7 +18,7 @@ app.use(cors());
 app.use(userRoutes);
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(rootDir, "views", "index.html"));
+  res.sendFile(path.join(rootDir, "public", "index.html"));
 });
 sequelize
   .sync()
